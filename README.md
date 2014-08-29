@@ -5,7 +5,7 @@ The goal of this assignment is to build your own simplified version of SSL, call
 Uses client/server sockets to create a TCP connection.
 The client server programs do the following:
 
-**  Handshake **
+**Handshake:**
 
     * The client and the server authenticate each other using certificates. You need to create the
     certificates and include them in the mySSL messages.
@@ -25,13 +25,13 @@ The client server programs do the following:
     communication between the client and the server) using this master secret. Pick your own key
     generation function (should be a function of the master secret).
 
-**  Data Phase **
+**Data Phase:**
 
-	* Use the SSL record format and securely transfer a file, at least 50 Kbytes long file, from the
-   server to client.
-
-   * Decrypt the file at the client and do a diff of the original and the decrypted file to ensure that
-   the secure file transfer was successful.
+	* Use the SSL record format and securely transfer a file, at least 50 Kbytes long file, 
+	from the server to client.
+	
+	* Decrypt the file at the client and do a diff of the original and the decrypted file to ensure
+	that the secure file transfer was successful.
 
 Using OpenSSL:
 =====
