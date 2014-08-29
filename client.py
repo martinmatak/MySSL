@@ -79,4 +79,3 @@ Alice.connect_ssl()
 Alice.write_msg("text msg")
 Alice.read_msg()
 Alice.close()
-#testing123
