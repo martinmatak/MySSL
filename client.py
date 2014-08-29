@@ -2,6 +2,7 @@ __author__ = 'k'
 """
 http://www.binarytides.com/python-socket-programming-tutorial/
 http://carlo-hamalainen.net/blog/2013/1/24/python-ssl-socket-echo-test-with-self-signed-certificate
+https://docs.python.org/2/library/ssl.html
 """
 import socket
 import ssl
