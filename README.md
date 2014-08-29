@@ -40,16 +40,17 @@ http://www.devsec.org/info/ssl-cert.html
 
 **Generating Client/Server certificates with a local CA:**
 
-1. Generate a CA & Sign request:
+**Generate a CA & Sign request:**
 
    * openssl req -out ca.pem -new -x509 -days 365
    *generates CA file "ca.pem" and CA key "privkey.pem"*
 
-2. Generate server certificate/key pair
+**Generate server certificate/key pair**
 
    * openssl genrsa -out server.key 1024
    * openssl req -key server.key -new -out server.req
    * openssl x509 -req -in server.req -CA CA.pem -CAkey privkey.pem -CAcreateserial -out server.pem
+
    *contents of "ca.srl" (created by the CAcreateserial command) is a two digit number.  eg. "00"*
 
 **Generate client certificate/key pair**
