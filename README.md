@@ -33,6 +33,17 @@ The client server programs do the following:
 	* Decrypt the file at the client and do a diff of the original and the decrypted file to ensure
 	that the secure file transfer was successful.
 
+**Notes:**
+
+	* Use openssl or any other security library of your choice in any form convenient to you to 
+	generate certificates and to extract public keys from certificates and also for keyed hash 
+	computation, encryption, and data integrity protection. 
+
+	* Include print commands in your code to show :
+		* Failed verification of keyed hashes (possibly due to corruption or changes in one of the 
+		handshake messages, etc.)
+		* Successful client-server mutual authentication, key establishment, and secure data transfer.
+
 Using OpenSSL:
 =====
 
