@@ -3,15 +3,18 @@ __author__ = 'k'
 http://www.binarytides.com/python-socket-programming-tutorial/
 http://carlo-hamalainen.net/blog/2013/1/24/python-ssl-socket-echo-test-with-self-signed-certificate
 https://docs.python.org/2/library/ssl.html
+http://www.laurentluce.com/posts/python-and-cryptography-with-pycrypto/
 """
+
+import binascii
 import socket
 import ssl
 import sys  # for exit
-#import pprint
+import json  # for serialization
+import hashlib  # for hashing
 
 
 class MySSLClient(object):
-
     def __init__(self, cert_path, name, host, port):
         """
         :param host: host for connection
@@ -20,6 +23,7 @@ class MySSLClient(object):
         :param cert_path: the CA cert path in order to verify the identity of the other side.
         """
         self.name = name
+        self.master = None
         try:
             #create an AF_INET(IPV4), STREAM socket (TCP)
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,7 +45,9 @@ class MySSLClient(object):
         # so here ca_certs is the CA cert
         self.ssl_sock = ssl.wrap_socket(self.sock,
                                         ca_certs=cert_path,
-                                        cert_reqs=ssl.CERT_REQUIRED)
+                                        cert_reqs=ssl.CERT_REQUIRED,
+                                        ssl_version=ssl.PROTOCOL_TLSv1)
+        print self.name + 'Server Certificate is valid (check with CA)'
 
     def connect_ssl(self):
         """
@@ -53,30 +59,50 @@ class MySSLClient(object):
         print self.name + "Encryption: " + str(self.ssl_sock.cipher())
         #print "[" + self.name + "] " + pprint.pformat(self.ssl_sock.getpeercert())
 
-    def write_msg(self, msg):
+    def write_ssl_msg(self, msg=None, txt="for the lulz"):
+        if not msg:  # list is empty
+            msg = [Alice.ssl_sock.cipher(), txt]
+        data = json.dumps(msg)  # serialize the object with json format.
         try:
             #Send the whole string
-            self.ssl_sock.sendall(msg)
+            self.ssl_sock.sendall(data)
+            reply = self.ssl_sock.read(4096)  # read up to 4096 bytes.
+            if reply != "":
+                print self.name + "received data from server: " + reply
+
+            #XOR strings to create a master key
+            print "%s Creating new master key, xor: \'%s\' & \'%s\'" % (self.name, msg[1], reply)
+            self.master = bin((int(binascii.hexlify(txt), 16)) ^ int(binascii.hexlify(reply), 16))
+
+            #Computes a hash out of the msgs sent & received + the string "CLIENT"
+            hash_sha1 = hashlib.sha1(txt + reply + "CLIENT")
+            hex_dig = hash_sha1.hexdigest()
+            print "%s SHA1 hash created: %s" % (self.name, hex_dig)
+            self.ssl_sock.sendall(hex_dig)
+
+            # Verify the server hash
+            server_hex = self.ssl_sock.read(2048)
+            if server_hex == hashlib.sha1(txt + reply + "SERVER").hexdigest():
+                print "%s Server hash verified" % self.name
+            else:
+                print "%s Server didn't receive all msgs correctly" % self.name
+
         except socket.error:
             #Send failed
             print 'Send failed'
             sys.exit()
 
-    def read_msg(self):
-        # Read a chunk of data.  Will not necessarily
-        # read all the data returned by the server.
-        data = self.ssl_sock.read(4096)  # read 4096 bytes.
-        if data != "":
-            print self.name + "received data from server:" + data
+    def read_ssl_msg(self):  # read the data returned by the server
+        pass
 
     def close(self):
         print self.name + "Closing"
         # note that closing the SSLSocket will also close the underlying socket
         self.ssl_sock.close()
 
-
+# the the following cert is the CA cert which signed the server cert.
 Alice = MySSLClient("certificates\CA\ca.pem", "[Alice]", "localhost", 1337)
 Alice.connect_ssl()
-Alice.write_msg("text msg")
-Alice.read_msg()
-Alice.close()
+Alice.write_ssl_msg()
+Alice.read_ssl_msg()
+#Alice.close()
