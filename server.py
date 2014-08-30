@@ -1,12 +1,13 @@
-import hashlib
-
 __author__ = 'k'
 
+import hashlib
 import socket
 import ssl
 import sys  # for exit
 import json
-import binascii  #ascii to binary
+import binascii  # ascii to binary
+from Crypto.Cipher import AES
+
 
 HOST = ''  # Symbolic name meaning all available interfaces
 PORT = 1337  # Arbitrary non-privileged port
@@ -33,12 +34,12 @@ class MySSLServer(object):
         except socket.error, msg:
             print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
             sys.exit()
-        self.bind.listen(10)
+        self.bind.listen(1)
         print '%s Socket now listening' % self.name
 
-    def recv_ssl_data(self):
+    def myssl_cert_server(self):
         """
-        This function is sued to recieve data over an ssl/TLS connection
+        This function does the following
         with public key encryption
         """
         while True:
@@ -80,11 +81,41 @@ class MySSLServer(object):
                     print "%s Client didn't receive all msgs correctly" % self.name
                 self.ssl_sock.sendall(hex_dig)  # send the server hash to client
 
+                self.myssl_pubkey_server()
+
             finally:
                 self.ssl_sock.shutdown(socket.SHUT_RDWR)
                 self.ssl_sock.close()
 
+    def myssl_symmetric_server(self):
+        #generate the RSA key
+        """
+
+
+        """
+        # tmp = binascii.
+        # rsakey = RSA.generate(512, self.master.get_bytes)
+        # print RSA.generate(512, self.master.get_bytes)
+        # print RSA.generate(512, self.master.get_bytes)
+        # print RSA.generate(512, self.master.get_bytes)
+        print Random.new().read
+        # rsapubkey = rsakey.publickey()
+        #
+        # #send the public key over
+        # self.ssl_sock.send(json.dumps(rsapubkey))
+        #
+        # rcstring = ''
+        # while 1:
+        #     buf = self.ssl_sock.recv(1024)
+        #     rcstring += buf
+        #     if not len(buf):
+        #       break
+        # #encmessage is the cipher text
+        # encmessage = pickle.loads(rcstring)
+        #
+        #   print rsakey.decrypt(encmessage)
+
 
 Bob = MySSLServer("[Bob]")
 Bob.start_server()
-Bob.recv_ssl_data()
+Bob.myssl_cert_server()

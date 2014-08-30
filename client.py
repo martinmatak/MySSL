@@ -49,7 +49,7 @@ class MySSLClient(object):
                                         ssl_version=ssl.PROTOCOL_TLSv1)
         print self.name + 'Server Certificate is valid (check with CA)'
 
-    def connect_ssl(self):
+    def myssl_connect(self):
         """
         connect to another server/client with ssl.
         """
@@ -59,7 +59,7 @@ class MySSLClient(object):
         print self.name + "Encryption: " + str(self.ssl_sock.cipher())
         #print "[" + self.name + "] " + pprint.pformat(self.ssl_sock.getpeercert())
 
-    def write_ssl_msg(self, msg=None, txt="for the lulz"):
+    def myssl_cert_client(self, msg=None, txt="for the lulz"):
         if not msg:  # list is empty
             msg = [Alice.ssl_sock.cipher(), txt]
         data = json.dumps(msg)  # serialize the object with json format.
@@ -100,9 +100,12 @@ class MySSLClient(object):
         # note that closing the SSLSocket will also close the underlying socket
         self.ssl_sock.close()
 
+    def myssl_symmetric_client(self):
+        pass
+
 # the the following cert is the CA cert which signed the server cert.
 Alice = MySSLClient("certificates\CA\ca.pem", "[Alice]", "localhost", 1337)
-Alice.connect_ssl()
-Alice.write_ssl_msg()
-Alice.read_ssl_msg()
+Alice.myssl_connect()
+Alice.myssl_cert_client()
+#Alice.read_ssl_msg()
 #Alice.close()
